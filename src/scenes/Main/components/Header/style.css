@@ -1,0 +1,23 @@
+@import 'styles/base/variables.css';
+@import 'styles/base.css';
+
+.header {
+  background-color: var(--white);
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+  height: 75px;
+}
+
+.logo {
+  margin-top: 23px;
+  margin-left: 23px;
+  position: relative;
+  width: 176px;
+  height: 176px;
+  display: inline-block;
+  background-image: url(./images/SpaceX_logo.png);
+  background-repeat: no-repeat;
+  background-size: 200px auto;
+}
