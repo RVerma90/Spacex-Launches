@@ -1,6 +1,7 @@
 'use strict';
 
-const autoprefixer = require('autoprefixer');
+const postcssImport = require('postcss-import');
+const postcssNext = require('postcss-cssnext');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -88,9 +89,9 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
-      
+
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
@@ -114,14 +115,14 @@ module.exports = {
       // First, run the linter.
       // It's important to do this before Babel processes the JS.
       {
-        test: /\.(js|jsx|mjs)$/,
+        test: /\.(js|jsx)$/,
         enforce: 'pre',
         use: [
           {
             options: {
               formatter: eslintFormatter,
               eslintPath: require.resolve('eslint'),
-              
+
             },
             loader: require.resolve('eslint-loader'),
           },
@@ -145,11 +146,11 @@ module.exports = {
           },
           // Process JS with Babel.
           {
-            test: /\.(js|jsx|mjs)$/,
+            test: /\.(js|jsx)$/,
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
+
               compact: true,
             },
           },
@@ -170,20 +171,15 @@ module.exports = {
             loader: ExtractTextPlugin.extract(
               Object.assign(
                 {
-                  fallback: {
-                    loader: require.resolve('style-loader'),
-                    options: {
-                      hmr: false,
-                    },
-                  },
+                  fallback: require.resolve('style-loader'),
                   use: [
                     {
                       loader: require.resolve('css-loader'),
                       options: {
                         importLoaders: 1,
-                        modules: true,
                         minimize: true,
                         sourceMap: shouldUseSourceMap,
+                        modules: true,
                       },
                     },
                     {
@@ -193,16 +189,19 @@ module.exports = {
                         // https://github.com/facebookincubator/create-react-app/issues/2677
                         ident: 'postcss',
                         plugins: () => [
+                          postcssImport({
+                            path: [path.join(__dirname, '../src')]
+                          }),
                           require('postcss-flexbugs-fixes'),
-                          autoprefixer({
+                          postcssNext({
                             browsers: [
                               '>1%',
                               'last 4 versions',
                               'Firefox ESR',
                               'not ie < 9', // React doesn't support IE8 anyway
-                            ],
-                            flexbox: 'no-2009',
+                            ]
                           }),
+                          require('postcss-neat')()
                         ],
                       },
                     },
@@ -273,9 +272,6 @@ module.exports = {
         // https://github.com/mishoo/UglifyJS2/issues/2011
         comparisons: false,
       },
-      mangle: {
-        safari10: true,
-      },        
       output: {
         comments: false,
         // Turned on because emoji and regex is not minified properly using default
